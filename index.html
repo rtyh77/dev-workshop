@@ -116,21 +116,38 @@
     </div>
 
     <script>
-        // دالة توليد الصور المجانية عبر Pollinations API
-        function generateImage() {
-            const prompt = document.getElementById('imagePrompt').value;
+        // --- دالة توليد الصور الذكية والمطورة (فهم كامل وترجمة دقيقة لأي وصف) ---
+        async function generateImage() {
+            const arabPrompt = document.getElementById('imagePrompt').value.trim();
             const outputDiv = document.getElementById('imageOutput');
-            if (!prompt) {
+            
+            if (!arabPrompt) {
                 alert('الرجاء كتابة وصف للصورة أولاً!');
                 return;
             }
-            outputDiv.innerHTML = '<p style="color: #8b949e;">جاري المعالجة وتوليد الصورة...</p>';
-            const encodedPrompt = encodeURIComponent(prompt);
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
             
-            setTimeout(() => {
+            outputDiv.innerHTML = '<p style="color: #8b949e;">🔄 جاري تحليل وفهم الوصف بدقة...</p>';
+
+            try {
+                // ترجمة الوصف تلقائياً من أي لغة إلى الإنجليزية لضمان دقة استجابة نموذج الصور
+                const translateResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${arabPrompt}`)}`);
+                const translateData = await translateResponse.json();
+                const rawTranslation = JSON.parse(translateData.contents);
+                
+                let englishPrompt = rawTranslation[0][0][0];
+                
+                // إضافة لمسة لزيادة جودة الصورة ووضوحها فقط بدون تغيير المعنى أو فرض مجال معين
+                englishPrompt += ", highly detailed, 4k, photorealistic";
+
+                const encodedPrompt = encodeURIComponent(englishPrompt);
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
+                
                 outputDiv.innerHTML = `<img src="${imageUrl}" alt="Generated AI Image">`;
-            }, 1000);
+
+            } catch (error) {
+                console.error("خطأ في معالجة الوصف:", error);
+                outputDiv.innerHTML = '<p style="color: #ff4444;">❌ حدث خطأ في معالجة الوصف، حاول مرة أخرى.</p>';
+            }
         }
 
         // دالة بسيطة لتوليد أفكار مبدئية
