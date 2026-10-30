@@ -98,10 +98,10 @@
     <div class="container">
         <!-- قسم توليد الصور الذكية -->
         <div class="card">
-            <h2>🎨 صانع الصور بالذكاء الاصطناعي</h2>
-            <p>اكتب وصفاً للصورة التي تريدها وسيقوم النظام بتوليدها فوراً:</p>
-            <input type="text" id="imagePrompt" placeholder="مثال: A futuristic developer workspace with glowing screens...">
-            <button onclick="generateImage()">توليد الصورة</button>
+            <h2>🎨 صانع الصور بالذكاء الاصطناعي (النسخة الاحترافية)</h2>
+            <p>اكتب وصفاً دقيقاً للصورة التي تريدها:</p>
+            <input type="text" id="imagePrompt" placeholder="مثال: غروب الشمس فوق بحر هادئ وصافٍ...">
+            <button onclick="generateImage()">توليد الصورة بدقة عالية</button>
             <div class="output-box" id="imageOutput"></div>
         </div>
 
@@ -116,7 +116,7 @@
     </div>
 
     <script>
-        // --- دالة توليد الصور الذكية والمطورة (فهم كامل وترجمة دقيقة لأي وصف) ---
+        // --- دالة توليد الصور عبر محرك دقيق ومحترف ---
         async function generateImage() {
             const arabPrompt = document.getElementById('imagePrompt').value.trim();
             const outputDiv = document.getElementById('imageOutput');
@@ -126,31 +126,43 @@
                 return;
             }
             
-            outputDiv.innerHTML = '<p style="color: #8b949e;">🔄 جاري تحليل وفهم الوصف بدقة...</p>';
+            outputDiv.innerHTML = '<p style="color: #8b949e;">🔄 جاري الترجمة والاتصال بالمحرك الاحترافي...</p>';
 
             try {
-                // ترجمة الوصف تلقائياً من أي لغة إلى الإنجليزية لضمان دقة استجابة نموذج الصور
+                // 1. ترجمة الوصف بدقة عالية جداً إلى الإنجليزية لضمان استجابة النموذج الصحيحة
                 const translateResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${arabPrompt}`)}`);
                 const translateData = await translateResponse.json();
                 const rawTranslation = JSON.parse(translateData.contents);
-                
                 let englishPrompt = rawTranslation[0][0][0];
-                
-                // إضافة لمسة لزيادة جودة الصورة ووضوحها فقط بدون تغيير المعنى أو فرض مجال معين
-                englishPrompt += ", highly detailed, 4k, photorealistic";
 
+                console.log("البرومبت المترجم:", englishPrompt);
+
+                // 2. استخدام محرك Pollinations المحدث مع بصمة عشوائية لضمان توليد صورة جديدة مطابقة تماماً وفورية
+                const seed = Math.floor(Math.random() * 1000000);
                 const encodedPrompt = encodeURIComponent(englishPrompt);
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&seed=${seed}&nologo=true`;
+
+                // تحميل الصورة والتأكد من ظهورها
+                const img = new Image();
+                img.src = imageUrl;
+                img.alt = "Generated Professional AI Image";
                 
-                outputDiv.innerHTML = `<img src="${imageUrl}" alt="Generated AI Image">`;
+                img.onload = function() {
+                    outputDiv.innerHTML = '';
+                    outputDiv.appendChild(img);
+                };
+
+                img.onerror = function() {
+                    outputDiv.innerHTML = '<p style="color: #ff4444;">❌ حدث خطأ أثناء تحميل الصورة، حاول مرة أخرى.</p>';
+                };
 
             } catch (error) {
-                console.error("خطأ في معالجة الوصف:", error);
-                outputDiv.innerHTML = '<p style="color: #ff4444;">❌ حدث خطأ في معالجة الوصف، حاول مرة أخرى.</p>';
+                console.error("خطأ:", error);
+                outputDiv.innerHTML = '<p style="color: #ff4444;">❌ فشل الاتصال بخدمة التوليد، تحقق من اتصالك.</p>';
             }
         }
 
-        // دالة بسيطة لتوليد أفكار مبدئية
+        // دالة توليد أفكار الفيديوهات
         function generateIdea() {
             const topic = document.getElementById('videoTopic').value;
             const outputDiv = document.getElementById('ideaOutput');
