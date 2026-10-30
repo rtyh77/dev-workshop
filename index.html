@@ -211,14 +211,12 @@
 
 <main class="container">
 
-  <!-- إعداد الاتصال -->
   <section class="card">
-
     <h2>🔑 إعداد الاتصال بمحرك الذكاء الاصطناعي</h2>
 
     <p>
-      تعتمد النسخة الجديدة على واجهة Pollinations Gen ونماذج أحدث.
-      تحتاج إلى مفتاح API خاص بك؛ لا تضع المفتاح داخل الكود أو مستودع GitHub.
+      تعتمد النسخة الجديدة على واجهة Pollinations Gen ونماذج حديثة.
+      استخدم مفتاحك الخاص من لوحة الحساب. لا تضع المفتاح داخل الكود أو المستودع.
     </p>
 
     <label for="apiKey">مفتاح API</label>
@@ -228,7 +226,7 @@
         id="apiKey"
         type="password"
         autocomplete="off"
-        placeholder="الصق مفتاحك هنا (sk_...)"
+        placeholder="الصق مفتاحك هنا (sk_ أو pk_...)"
       >
 
       <button class="smallbtn" id="toggleKey" type="button">
@@ -238,7 +236,7 @@
 
     <p class="note">
       يُحفظ المفتاح في ذاكرة الجلسة الحالية فقط، ويُمسح عند إغلاق التبويب.
-      راجع لوحة الخدمة لمعرفة الرصيد والتكلفة والحدود قبل التوليد.
+      راجع لوحة الخدمة لمعرفة الرصيد، التكلفة والحدود قبل التوليد.
     </p>
 
     <a
@@ -253,28 +251,23 @@
     <div id="keyStatus" class="status">
       لم يتم إدخال مفتاح بعد.
     </div>
-
   </section>
 
-  <!-- مولد الصور -->
   <section class="card">
-
     <h2>🎨 صانع الصور بالذكاء الاصطناعي</h2>
 
     <p>
-      اكتب وصف الصورة بالعربية أو الإنجليزية.
-      للحصول على نتيجة أدق، اذكر الموضوع والمكان والإضاءة والأسلوب والتكوين.
+      اكتب وصف الصورة بالعربية أو الإنجليزية. للحصول على نتيجة أدق، اذكر الموضوع والمكان والإضاءة والأسلوب والتكوين.
     </p>
 
     <label for="imagePrompt">وصف الصورة</label>
 
     <textarea
       id="imagePrompt"
-      placeholder="مثال: مسجد أبيض وسط كثبان الصحراء الجزائرية وقت الغروب، إضاءة سينمائية دافئة، تصوير واقعي عالي التفاصيل..."
+      placeholder="مثال: مسجد أبيض وسط كثبان الصحراء الجزائرية وقت الغروب، إضاءة سينمائية دافئة، تصوير واقعي عالي الدقة، تفاصيل دقيقة."
     ></textarea>
 
     <div class="row">
-
       <div>
         <label for="imageModel">نموذج الصور</label>
 
@@ -282,11 +275,9 @@
           <option value="black-forest-labs/flux.1-schnell">
             FLUX.1 Schnell — سريع
           </option>
-
           <option value="google/gemini-3.1-flash-image">
             Gemini Flash Image — فهم متقدم للوصف
           </option>
-
           <option value="black-forest-labs/flux.2-pro">
             FLUX.2 Pro — جودة أعلى (قد يكون أغلى)
           </option>
@@ -302,28 +293,17 @@
           <option value="1536x1024">أفقي 3:2</option>
         </select>
       </div>
-
     </div>
 
     <label for="imageStyle">الأسلوب (اختياري)</label>
 
     <select id="imageStyle">
       <option value="">بدون تحديد</option>
-      <option value="photorealistic, professional photography">
-        واقعي فوتوغرافي
-      </option>
-      <option value="cinematic lighting, cinematic composition">
-        سينمائي
-      </option>
-      <option value="digital illustration, highly detailed">
-        رسم رقمي
-      </option>
-      <option value="3D render, detailed materials">
-        ثلاثي الأبعاد
-      </option>
-      <option value="anime art, polished composition">
-        أنمي
-      </option>
+      <option value="photorealistic, professional photography">واقعي فوتوغرافي</option>
+      <option value="cinematic lighting, cinematic composition">سينمائي</option>
+      <option value="digital illustration, highly detailed">رسم رقمي</option>
+      <option value="3D render, detailed materials">ثلاثي الأبعاد</option>
+      <option value="anime art, polished composition">أنمي</option>
     </select>
 
     <button id="generateImageBtn" type="button">
@@ -335,12 +315,9 @@
     </div>
 
     <div class="output-box" id="imageOutput"></div>
-
   </section>
 
-  <!-- مولد الفيديوهات -->
   <section class="card">
-
     <h2>📝 مولّد أفكار الفيديوهات والسكريبت</h2>
 
     <p>
@@ -356,7 +333,6 @@
     >
 
     <div class="row">
-
       <div>
         <label for="videoPlatform">المنصة</label>
 
@@ -378,7 +354,6 @@
           <option value="5 دقائق">5 دقائق</option>
         </select>
       </div>
-
     </div>
 
     <button id="generateIdeaBtn" type="button">
@@ -390,14 +365,12 @@
     </div>
 
     <div id="ideaOutput" class="idea hidden"></div>
-
   </section>
 
 </main>
 
 <script>
 (() => {
-
   "use strict";
 
   const $ = id => document.getElementById(id);
@@ -407,28 +380,22 @@
 
   let currentImageUrl = null;
 
-  // حفظ المفتاح في ذاكرة الجلسة فقط
   try {
     const savedKey = sessionStorage.getItem(KEY_STORE);
-
     if (savedKey) {
       $("apiKey").value = savedKey;
     }
-
   } catch (_) {}
 
   $("apiKey").addEventListener("input", () => {
-
     const key = $("apiKey").value.trim();
 
     try {
-
       if (key) {
         sessionStorage.setItem(KEY_STORE, key);
       } else {
         sessionStorage.removeItem(KEY_STORE);
       }
-
     } catch (_) {}
 
     $("keyStatus").textContent = key
@@ -436,399 +403,221 @@
       : "لم يتم إدخال مفتاح بعد.";
 
     $("keyStatus").className = "status";
-
   });
 
-  // إظهار وإخفاء المفتاح
   $("toggleKey").addEventListener("click", () => {
-
     const field = $("apiKey");
-
-    field.type =
-      field.type === "password" ? "text" : "password";
-
-    $("toggleKey").textContent =
-      field.type === "password" ? "إظهار" : "إخفاء";
-
+    field.type = field.type === "password" ? "text" : "password";
+    $("toggleKey").textContent = field.type === "password" ? "إظهار" : "إخفاء";
   });
+
+  function normalizeKey(value) {
+    return String(value || "").trim().replace(/^Bearer\s+/i, "");
+  }
 
   function getApiKey() {
-
-    const key = $("apiKey").value.trim();
-
+    const key = normalizeKey($("apiKey").value);
     if (!key) {
-      throw new Error(
-        "أدخل مفتاح API أولاً من قسم إعداد الاتصال."
-      );
+      throw new Error("أدخل مفتاح API أولاً من قسم إعداد الاتصال.");
     }
-
     return key;
   }
 
   function setStatus(id, message, type = "") {
-
     const el = $(id);
-
     el.textContent = message;
-
-    el.className =
-      "status" + (type ? " " + type : "");
-
+    el.className = "status" + (type ? " " + type : "");
   }
 
   function parseSize(value) {
-
-    const [width, height] =
-      value.split("x").map(Number);
-
+    const [width, height] = String(value).split("x").map(Number);
     return { width, height };
-
   }
 
-  // تجهيز رابط توليد الصورة
   function buildImageUrl(prompt, model, size, key) {
-
     const { width, height } = parseSize(size);
-
-    const url = new URL(
-      API_BASE + "/image/" + encodeURIComponent(prompt)
-    );
+    const url = new URL(API_BASE + "/image/" + encodeURIComponent(prompt));
 
     url.searchParams.set("model", model);
-    url.searchParams.set("width", width);
-    url.searchParams.set("height", height);
+    url.searchParams.set("width", String(width));
+    url.searchParams.set("height", String(height));
     url.searchParams.set("nologo", "true");
-    url.searchParams.set("key", key);
+
+    if (key) {
+      url.searchParams.set("key", key);
+    }
 
     return url.toString();
-
   }
 
-  // توليد الصور
   $("generateImageBtn").addEventListener("click", async () => {
-
     const prompt = $("imagePrompt").value.trim();
-
     const output = $("imageOutput");
-
     const button = $("generateImageBtn");
 
     if (!prompt) {
-
-      return setStatus(
-        "imageStatus",
-        "اكتب وصف الصورة أولاً.",
-        "error"
-      );
-
+      return setStatus("imageStatus", "اكتب وصف الصورة أولاً.", "error");
     }
 
     let key;
-
     try {
-
       key = getApiKey();
-
     } catch (error) {
-
-      return setStatus(
-        "imageStatus",
-        error.message,
-        "error"
-      );
-
+      return setStatus("imageStatus", error.message, "error");
     }
 
     const style = $("imageStyle").value;
-
-    const finalPrompt = style
-      ? `${prompt}, ${style}`
-      : prompt;
-
+    const finalPrompt = style ? `${prompt}, ${style}` : prompt;
     const model = $("imageModel").value;
-
     const size = $("imageSize").value;
 
     button.disabled = true;
-
     button.textContent = "جارٍ التوليد...";
-
     output.replaceChildren();
-
-    setStatus(
-      "imageStatus",
-      "⏳ يتم إرسال الطلب إلى محرك الصور. قد يستغرق ذلك بعض الوقت..."
-    );
+    setStatus("imageStatus", "⏳ يتم إرسال الطلب إلى محرك الصور. قد يستغرق ذلك بعض الوقت...");
 
     const image = new Image();
-
-    image.alt = "الصورة التي تم توليدها";
-
+    image.alt = "الصورة التي تم توليعها";
     image.loading = "eager";
-
     image.referrerPolicy = "no-referrer";
 
-    const imageUrl = buildImageUrl(
-      finalPrompt,
-      model,
-      size,
-      key
-    );
-
+    const imageUrl = buildImageUrl(finalPrompt, model, size, key);
     currentImageUrl = imageUrl;
 
     let finished = false;
-
     const timeout = setTimeout(() => {
-
       if (finished) return;
-
       finished = true;
-
       image.src = "";
-
-      setStatus(
-        "imageStatus",
-        "انتهت مهلة الانتظار. جرّب نموذجاً أسرع أو أعد المحاولة.",
-        "error"
-      );
-
+      setStatus("imageStatus", "انتهت مهلة الانتظار. جرّب نموذجاً أسرع أو أعد المحاولة.", "error");
       button.disabled = false;
-
       button.textContent = "توليد الصورة";
-
     }, 180000);
 
     image.onload = () => {
-
       if (finished) return;
-
       finished = true;
-
       clearTimeout(timeout);
 
       output.replaceChildren(image);
 
       const download = document.createElement("a");
-
       download.className = "download";
-
       download.href = imageUrl;
-
       download.target = "_blank";
-
       download.rel = "noopener noreferrer";
-
       download.textContent = "فتح الصورة بالحجم الكامل";
-
       output.appendChild(download);
 
-      setStatus(
-        "imageStatus",
-        "✅ اكتمل توليد الصورة. يمكنك فتحها وحفظها من المتصفح.",
-        "ok"
-      );
-
+      setStatus("imageStatus", "✅ اكتمل توليد الصورة. يمكنك فتحها وحفظها من المتصفح.", "ok");
       button.disabled = false;
-
       button.textContent = "توليد صورة أخرى";
-
     };
 
     image.onerror = () => {
-
       if (finished) return;
-
       finished = true;
-
       clearTimeout(timeout);
 
+      console.error("Image generation failed:", imageUrl);
       setStatus(
         "imageStatus",
-        "❌ تعذر توليد الصورة. تحقق من المفتاح والرصيد واسم النموذج، ثم جرّب مجدداً. قد يكون السبب رفض الطلب أو ضغط الخدمة.",
+        "❌ تعذر توليد الصورة. تحقق من المفتاح والرصيد واسم النموذج، ثم جرّب مجدداً. قد يكون السبب رفض الطلب أو ضغط الخادم.",
         "error"
       );
 
       button.disabled = false;
-
       button.textContent = "إعادة المحاولة";
-
     };
 
     image.src = imageUrl;
-
   });
 
-  // توليد أفكار الفيديوهات والسكريبت
   $("generateIdeaBtn").addEventListener("click", async () => {
-
     const topic = $("videoTopic").value.trim();
-
     const button = $("generateIdeaBtn");
-
     const output = $("ideaOutput");
 
     if (!topic) {
-
-      return setStatus(
-        "ideaStatus",
-        "أدخل موضوع الفيديو أولاً.",
-        "error"
-      );
-
+      return setStatus("ideaStatus", "أدخل موضوع الفيديو أولاً.", "error");
     }
 
     let key;
-
     try {
-
       key = getApiKey();
-
     } catch (error) {
-
-      return setStatus(
-        "ideaStatus",
-        error.message,
-        "error"
-      );
-
+      return setStatus("ideaStatus", error.message, "error");
     }
 
     button.disabled = true;
-
     button.textContent = "جارٍ إنشاء السيناريو...";
-
     output.classList.add("hidden");
-
-    setStatus(
-      "ideaStatus",
-      "⏳ يكتب النموذج فكرة الفيديو والسكريبت..."
-    );
+    setStatus("ideaStatus", "⏳ يكتب النموذج فكرة الفيديو والسكريبت...");
 
     const platform = $("videoPlatform").value;
-
     const duration = $("videoDuration").value;
 
     const requestBody = {
-
       model: "openai/gpt-5.4-nano",
-
       messages: [
-
         {
           role: "system",
-
           content:
-            "أنت كاتب محتوى عربي محترف. اكتب بالعربية الواضحة وبأسلوب عملي ومناسب لصناع المحتوى. لا تخترع حقائق أو إحصاءات. أخرج عنواناً جذاباً، وخطاف أول 3 ثوانٍ، وتقسيماً زمنياً للمشاهد، ونص التعليق الصوتي، واقتراحاً بصرياً، وخاتمة ودعوة للتفاعل."
+            "أنت كاتب محتوى عربي محترف. اكتب بالعربية الواضحة وبأسلوب عملي ومناسب لصناع المحتوى. لا تخترع حقائق أو أرقام غير مؤكدة. اكتب بتنسيق واضح وقابل للتنفيذ، مع عنوان جذاب، مقدمة قصيرة، نقاط رئيسية، سيناريو متدرج، وخاتمة قوية."
         },
-
         {
           role: "user",
-
-          content:
-            `أنشئ فكرة وسيناريو لفيديو عن: ${topic}
+          content: `أنشئ فكرة وسيناريو لفيديو عن: ${topic}
 المنصة: ${platform}
 المدة: ${duration}
-اجعل النص قابلاً للتنفيذ ولا تستخدم مقدمات حشو.`
+اجعل النص قابلاً للتنفيذ، عملياً، وبأسلوب عربي احترافي ومناسب للمحتوى الرقمي.`
         }
-
       ],
-
       temperature: 0.8,
-
       max_tokens: 1200
-
     };
 
     const controller = new AbortController();
-
-    const timeout = setTimeout(
-      () => controller.abort(),
-      90000
-    );
+    const timeout = setTimeout(() => controller.abort(), 90000);
 
     try {
-
-      const response = await fetch(
-        API_BASE + "/v1/chat/completions",
-        {
-
-          method: "POST",
-
-          headers: {
-
-            "Content-Type": "application/json",
-
-            "Authorization": "Bearer " + key
-
-          },
-
-          body: JSON.stringify(requestBody),
-
-          signal: controller.signal
-
-        }
-      );
+      const response = await fetch(API_BASE + "/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + key
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
+      });
 
       if (!response.ok) {
-
         const detail = await response.text().catch(() => "");
-
-        throw new Error(
-          `فشل الطلب (${response.status}). ${detail.slice(0, 240)}`
-        );
-
+        throw new Error(`فشل الطلب (${response.status}). ${detail.slice(0, 240)}`);
       }
 
       const data = await response.json();
-
-      const text =
-        data?.choices?.[0]?.message?.content;
+      const text = data?.choices?.[0]?.message?.content;
 
       if (!text) {
-
-        throw new Error(
-          "وصل رد غير متوقع من النموذج."
-        );
-
+        throw new Error("وصل رد غير متوقع من النموذج.");
       }
 
       output.textContent = text;
-
       output.classList.remove("hidden");
-
-      setStatus(
-        "ideaStatus",
-        "✅ تم إنشاء السيناريو بنجاح.",
-        "ok"
-      );
-
+      setStatus("ideaStatus", "✅ تم إنشاء السيناريو بنجاح.", "ok");
     } catch (error) {
+      const message = error.name === "AbortError"
+        ? "انتهت مهلة الطلب. حاول مجدداً."
+        : error.message || "حدث خطأ غير متوقع.";
 
-      const message =
-        error.name === "AbortError"
-          ? "انتهت مهلة الطلب. حاول مجدداً."
-          : error.message;
-
-      setStatus(
-        "ideaStatus",
-        "❌ " + message,
-        "error"
-      );
-
+      setStatus("ideaStatus", "❌ " + message, "error");
     } finally {
-
       clearTimeout(timeout);
-
       button.disabled = false;
-
-      button.textContent =
-        "إنشاء فكرة وسيناريو ذكي";
-
+      button.textContent = "إنشاء فكرة وسيناريو ذكي";
     }
-
   });
-
 })();
 </script>
 
