@@ -70,9 +70,7 @@
       font-size: 1.35rem;
     }
 
-    p {
-      margin: 10px 0;
-    }
+    p { margin: 10px 0; }
 
     label {
       display: block;
@@ -118,9 +116,7 @@
       margin-top: 12px;
     }
 
-    button:hover, .download:hover {
-      filter: brightness(1.15);
-    }
+    button:hover, .download:hover { filter: brightness(1.15); }
 
     button:disabled {
       opacity: .6;
@@ -146,21 +142,12 @@
       background: #0d1117;
       border: 1px solid var(--border);
       white-space: pre-wrap;
+      word-break: break-word;
     }
 
-    .status.error {
-      color: #ff7b72;
-      border-color: #6e3030;
-    }
-
-    .status.ok {
-      color: #7ee787;
-    }
-
-    .status.warn {
-      color: #f2c66d;
-      border-color: #7d5d1d;
-    }
+    .status.error { color: #ff7b72; border-color: #6e3030; }
+    .status.ok { color: #7ee787; }
+    .status.warn { color: #f2c66d; border-color: #7d5d1d; }
 
     .output-box {
       margin-top: 14px;
@@ -176,15 +163,14 @@
       border: 1px solid var(--border);
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     .idea {
       background: #0d1117;
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 14px;
+      margin-top: 12px;
       text-align: right;
       white-space: pre-wrap;
     }
@@ -195,9 +181,7 @@
       align-items: center;
     }
 
-    .keyline input {
-      flex: 1;
-    }
+    .keyline input { flex: 1; }
 
     .smallbtn {
       width: auto;
@@ -220,13 +204,18 @@
       flex: 1 1 180px;
     }
 
+    .inline-actions .download {
+      flex: 1 1 180px;
+    }
+
     @media (max-width: 560px) {
       body { padding: 12px; }
       .row { grid-template-columns: 1fr; }
       .keyline { display: block; }
       .smallbtn { width: 100%; }
       .inline-actions { display: block; }
-      .inline-actions button { width: 100%; }
+      .inline-actions button,
+      .inline-actions .download { width: 100%; margin-top: 8px; }
     }
   </style>
 </head>
@@ -241,7 +230,7 @@
 
   <section class="card">
     <h2>🔑 إعداد الاتصال</h2>
-    <p>تأكد من أن الخادم يعمل محلياً عبر localhost، لأن بعض خدمات Pollinations لا تستجيب عندما تفتح الملف مباشرة.</p>
+    <p>أدخل مفتاح Pollinations API الخاص بك لتفعيل الأدوات أدناه. إذا فتحت الملف مباشرة من جهازك فقد لا تعمل بعض الخدمات، فاستخدم الموقع المنشور أو خادماً محلياً.</p>
 
     <label for="apiKey">مفتاح API</label>
     <div class="keyline">
@@ -341,18 +330,29 @@
 (() => {
   "use strict";
 
-  const $ = (id) => document.getElementById(id);
+  // الإصلاح الرئيسي: الدالة تقبل "#id" و "id" معاً
+  const $ = (sel) => document.getElementById(String(sel).replace(/^#/, ""));
+
   const API_BASE = "https://gen.pollinations.ai";
   const KEY_STORE = "devWorkshopSessionKey";
   const DEFAULT_IMAGE_MODEL = "black-forest-labs/flux.1-schnell";
   const DEFAULT_TEXT_MODEL = "openai/gpt-5.4-nano";
 
+  function setStatus(id, message, type = "") {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = message;
+    el.className = "status" + (type ? " " + type : "");
+  }
+
   function showEnvironmentWarning() {
     if (window.location.protocol === "file:") {
-      setStatus("keyStatus", "⚠️ انت تفتح الملف مباشرةً. استخدم خادم محلي مثل: python -m http.server 8000 ثم افتح http://localhost:8000", "warn");
-      return true;
+      setStatus(
+        "keyStatus",
+        "⚠️ أنت تفتح الملف مباشرةً من الجهاز. استخدم خادماً محلياً مثل: python -m http.server 8000 ثم افتح http://localhost:8000",
+        "warn"
+      );
     }
-    return false;
   }
 
   function normalizeKey(value) {
@@ -360,17 +360,11 @@
   }
 
   function getApiKey() {
-    const key = normalizeKey($("#apiKey").value);
+    const key = normalizeKey($("apiKey").value);
     if (!key) {
       throw new Error("أدخل مفتاح API أولاً من قسم إعداد الاتصال.");
     }
     return key;
-  }
-
-  function setStatus(id, message, type = "") {
-    const el = $(id);
-    el.textContent = message;
-    el.className = "status" + (type ? " " + type : "");
   }
 
   function parseSize(value) {
@@ -385,13 +379,14 @@
     url.searchParams.set("width", String(width || 1024));
     url.searchParams.set("height", String(height || 1024));
     url.searchParams.set("nologo", "true");
+    url.searchParams.set("seed", String(Math.floor(Math.random() * 1000000)));
     if (key) url.searchParams.set("key", key);
     return url.toString();
   }
 
   function saveKeyToSession() {
     try {
-      const key = $("#apiKey").value.trim();
+      const key = normalizeKey($("apiKey").value);
       if (key) {
         sessionStorage.setItem(KEY_STORE, key);
       } else {
@@ -400,41 +395,42 @@
     } catch (_) {}
   }
 
+  // استرجاع المفتاح المحفوظ في الجلسة
   try {
     const savedKey = sessionStorage.getItem(KEY_STORE);
-    if (savedKey) $("#apiKey").value = savedKey;
+    if (savedKey) {
+      $("apiKey").value = savedKey;
+      setStatus("keyStatus", "تم استرجاع المفتاح المحفوظ لهذه الجلسة.");
+    }
   } catch (_) {}
 
   showEnvironmentWarning();
 
-  $("#apiKey").addEventListener("input", () => {
-    const key = $("#apiKey").value.trim();
+  $("apiKey").addEventListener("input", () => {
+    const key = normalizeKey($("apiKey").value);
     saveKeyToSession();
-    $("#keyStatus").textContent = key ? "تم حفظ المفتاح لهذه الجلسة فقط." : "لم يتم إدخال مفتاح بعد.";
-    $("#keyStatus").className = "status";
+    setStatus("keyStatus", key ? "تم حفظ المفتاح لهذه الجلسة فقط." : "لم يتم إدخال مفتاح بعد.");
   });
 
-  $("#toggleKey").addEventListener("click", () => {
-    const field = $("#apiKey");
+  $("toggleKey").addEventListener("click", () => {
+    const field = $("apiKey");
     field.type = field.type === "password" ? "text" : "password";
-    $("#toggleKey").textContent = field.type === "password" ? "إظهار" : "إخفاء";
+    $("toggleKey").textContent = field.type === "password" ? "إظهار" : "إخفاء";
   });
 
   async function testApiConnection() {
-    const key = normalizeKey($("#apiKey").value);
+    const key = normalizeKey($("apiKey").value);
 
     if (!key) {
       setStatus("keyStatus", "أدخل مفتاح API أولاً ثم جرّب الاتصال.", "error");
       return;
     }
 
-    setStatus("keyStatus", "⏳ جاري اختبار الاتصال...", "");
+    setStatus("keyStatus", "⏳ جاري اختبار الاتصال...");
 
     try {
       const response = await fetch(API_BASE + "/v1/models", {
-        headers: {
-          Authorization: "Bearer " + key
-        }
+        headers: { Authorization: "Bearer " + key }
       });
 
       if (!response.ok) {
@@ -450,98 +446,105 @@
     }
   }
 
-  $("#testApiBtn").addEventListener("click", testApiConnection);
+  $("testApiBtn").addEventListener("click", testApiConnection);
 
-  $("#generateImageBtn").addEventListener("click", async () => {
-    const prompt = $("#imagePrompt").value.trim();
-    const output = $("#imageOutput");
-    const button = $("#generateImageBtn");
+  // ===== توليد الصور =====
+  $("generateImageBtn").addEventListener("click", () => {
+    const prompt = $("imagePrompt").value.trim();
+    const output = $("imageOutput");
+    const button = $("generateImageBtn");
 
     if (!prompt) {
       setStatus("imageStatus", "اكتب وصف الصورة أولاً.", "error");
       return;
     }
 
+    let key;
     try {
-      const key = getApiKey();
-      const model = $("#imageModel").value || DEFAULT_IMAGE_MODEL;
-      const size = $("#imageSize").value;
-      const style = $("#imageStyle").value;
-      const finalPrompt = style ? `${prompt}, ${style}` : prompt;
-
-      button.disabled = true;
-      button.textContent = "جارٍ التوليد...";
-      output.replaceChildren();
-      setStatus("imageStatus", "⏳ يتم إرسال الطلب إلى محرك الصور...");
-
-      const image = new Image();
-      image.alt = "Image result";
-      image.loading = "eager";
-      image.referrerPolicy = "no-referrer";
-
-      const imageUrl = buildImageUrl(finalPrompt, model, size, key);
-      let finished = false;
-
-      const timeout = setTimeout(() => {
-        if (finished) return;
-        finished = true;
-        image.src = "";
-        setStatus("imageStatus", "انتهت مهلة الانتظار. جرّب نموذجاً أسرع أو أعد المحاولة.", "error");
-        button.disabled = false;
-        button.textContent = "توليد الصورة";
-      }, 180000);
-
-      image.onload = () => {
-        if (finished) return;
-        finished = true;
-        clearTimeout(timeout);
-
-        output.replaceChildren(image);
-
-        const download = document.createElement("a");
-        download.className = "download";
-        download.href = imageUrl;
-        download.target = "_blank";
-        download.rel = "noopener noreferrer";
-        download.textContent = "فتح الصورة بالحجم الكامل";
-        output.appendChild(download);
-
-        setStatus("imageStatus", "✅ اكتمل توليد الصورة. يمكنك فتحها وحفظها من المتصفح.", "ok");
-        button.disabled = false;
-        button.textContent = "توليد صورة أخرى";
-      };
-
-      image.onerror = () => {
-        if (finished) return;
-        finished = true;
-        clearTimeout(timeout);
-        setStatus("imageStatus", "❌ تعذر توليد الصورة. تحقق من المفتاح، الرصيد، والنموذج المختار، ثم جرّب مجدداً.", "error");
-        button.disabled = false;
-        button.textContent = "إعادة المحاولة";
-      };
-
-      image.src = imageUrl;
+      key = getApiKey();
     } catch (error) {
-      setStatus("imageStatus", "❌ " + (error.message || "حدث خطأ غير متوقع."), "error");
+      setStatus("imageStatus", "❌ " + error.message, "error");
+      return;
+    }
+
+    const model = $("imageModel").value || DEFAULT_IMAGE_MODEL;
+    const size = $("imageSize").value;
+    const style = $("imageStyle").value;
+    const finalPrompt = style ? `${prompt}, ${style}` : prompt;
+
+    button.disabled = true;
+    button.textContent = "جارٍ التوليد...";
+    output.replaceChildren();
+    setStatus("imageStatus", "⏳ يتم إرسال الطلب إلى محرك الصور... قد يستغرق دقيقة.");
+
+    const imageUrl = buildImageUrl(finalPrompt, model, size, key);
+    const image = new Image();
+    image.alt = "Image result";
+    image.referrerPolicy = "no-referrer";
+
+    let finished = false;
+
+    const timeout = setTimeout(() => {
+      if (finished) return;
+      finished = true;
+      image.onload = null;
+      image.onerror = null;
+      image.src = "";
+      setStatus("imageStatus", "انتهت مهلة الانتظار. جرّب نموذجاً أسرع أو أعد المحاولة.", "error");
       button.disabled = false;
       button.textContent = "توليد الصورة";
-    }
+    }, 180000);
+
+    image.onload = () => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timeout);
+
+      output.replaceChildren(image);
+
+      const link = document.createElement("a");
+      link.className = "download";
+      link.href = imageUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "فتح الصورة بالحجم الكامل";
+      output.appendChild(link);
+
+      setStatus("imageStatus", "✅ اكتمل توليد الصورة. يمكنك فتحها وحفظها من المتصفح.", "ok");
+      button.disabled = false;
+      button.textContent = "توليد صورة أخرى";
+    };
+
+    image.onerror = () => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timeout);
+      setStatus("imageStatus", "❌ تعذر توليد الصورة. تحقق من المفتاح والرصيد والنموذج المختار، ثم جرّب مجدداً.", "error");
+      button.disabled = false;
+      button.textContent = "إعادة المحاولة";
+    };
+
+    image.src = imageUrl;
   });
 
-  $("#generateIdeaBtn").addEventListener("click", async () => {
-    const topic = $("#videoTopic").value.trim();
-    const button = $("#generateIdeaBtn");
-    const output = $("#ideaOutput");
+  // ===== مولّد فكرة الفيديو =====
+  $("generateIdeaBtn").addEventListener("click", async () => {
+    const topic = $("videoTopic").value.trim();
+    const button = $("generateIdeaBtn");
+    const output = $("ideaOutput");
 
     if (!topic) {
       setStatus("ideaStatus", "أدخل موضوع الفيديو أولاً.", "error");
       return;
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 90000);
+
     try {
       const key = getApiKey();
-      const platform = $("#videoPlatform").value;
-      const duration = $("#videoDuration").value;
+      const platform = $("videoPlatform").value;
+      const duration = $("videoDuration").value;
 
       button.disabled = true;
       button.textContent = "جارٍ إنشاء السيناريو...";
@@ -564,41 +567,37 @@
         max_tokens: 1200
       };
 
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 90000);
+      const response = await fetch(API_BASE + "/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + key
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
+      });
 
-      try {
-        const response = await fetch(API_BASE + "/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + key
-          },
-          body: JSON.stringify(requestBody),
-          signal: controller.signal
-        });
-
-        if (!response.ok) {
-          const detail = await response.text().catch(() => "");
-          throw new Error(`فشل الطلب (${response.status}). ${detail.slice(0, 240)}`);
-        }
-
-        const data = await response.json();
-        const text = data?.choices?.[0]?.message?.content;
-        if (!text) {
-          throw new Error("وصل رد غير متوقع من النموذج.");
-        }
-
-        output.textContent = text;
-        output.classList.remove("hidden");
-        setStatus("ideaStatus", "✅ تم إنشاء السيناريو بنجاح.", "ok");
-      } finally {
-        clearTimeout(timeout);
+      if (!response.ok) {
+        const detail = await response.text().catch(() => "");
+        throw new Error(`فشل الطلب (${response.status}). ${detail.slice(0, 240)}`);
       }
+
+      const data = await response.json();
+      const text = data?.choices?.[0]?.message?.content;
+      if (!text) {
+        throw new Error("وصل رد غير متوقع من النموذج.");
+      }
+
+      output.textContent = text;
+      output.classList.remove("hidden");
+      setStatus("ideaStatus", "✅ تم إنشاء السيناريو بنجاح.", "ok");
     } catch (error) {
-      const message = error.name === "AbortError" ? "انتهت مهلة الطلب. حاول مجدداً." : (error.message || "حدث خطأ غير متوقع.");
+      const message = error.name === "AbortError"
+        ? "انتهت مهلة الطلب. حاول مجدداً."
+        : (error.message || "حدث خطأ غير متوقع.");
       setStatus("ideaStatus", "❌ " + message, "error");
     } finally {
+      clearTimeout(timeout);
       button.disabled = false;
       button.textContent = "إنشاء فكرة وسيناريو ذكي";
     }
@@ -607,4 +606,4 @@
 </script>
 
 </body>
-      </html>
+</html>
