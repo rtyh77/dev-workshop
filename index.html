@@ -86,6 +86,11 @@
             border-radius: 8px;
             border: 1px solid var(--border-color);
         }
+        .note {
+            font-size: 0.85rem;
+            color: #8b949e;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -98,14 +103,15 @@
     <div class="container">
         <!-- قسم توليد الصور الذكية -->
         <div class="card">
-            <h2>🎨 صانع الصور بالذكاء الاصطناعي (النسخة الاحترافية)</h2>
-            <p>اكتب وصفاً دقيقاً للصورة التي تريدها:</p>
-            <input type="text" id="imagePrompt" placeholder="مثال: غروب الشمس فوق بحر هادئ وصافٍ...">
-            <button onclick="generateImage()">توليد الصورة بدقة عالية</button>
+            <h2>🎨 صانع الصور بالذكاء الاصطناعي</h2>
+            <p>اكتب وصفاً للصورة التي تريدها (أفضل النتائج باللغة الإنجليزية لضمان الدقة):</p>
+            <input type="text" id="imagePrompt" placeholder="Example: futuristic developer workspace, 4k">
+            <div class="note">💡 نصيحة: اكتب الوصف بالإنجليزية (مثل: Sunset over sea) لضمان دقة 100% وعدم حدوث أخطاء.</div>
+            <button onclick="generateImage()" style="margin-top: 15px;">توليد الصورة مباشرة</button>
             <div class="output-box" id="imageOutput"></div>
         </div>
 
-        <!-- قسم الملاحظات أو السكريبتات -->
+        <!-- قسم السكريبتات -->
         <div class="card">
             <h2>📝 مولد أفكار الفيديوهات والسكريبت</h2>
             <p>اختر موضوعاً لفيديو قناتك القادم واحصل على هيكلة سريعة:</p>
@@ -116,55 +122,39 @@
     </div>
 
     <script>
-        // --- دالة توليد الصور عبر محرك دقيق ومحترف ---
-        async function generateImage() {
-            const arabPrompt = document.getElementById('imagePrompt').value.trim();
+        // --- دالة توليد الصور المباشرة والمضمونة ---
+        function generateImage() {
+            const prompt = document.getElementById('imagePrompt').value.trim();
             const outputDiv = document.getElementById('imageOutput');
             
-            if (!arabPrompt) {
+            if (!prompt) {
                 alert('الرجاء كتابة وصف للصورة أولاً!');
                 return;
             }
             
-            outputDiv.innerHTML = '<p style="color: #8b949e;">🔄 جاري الترجمة والاتصال بالمحرك الاحترافي...</p>';
+            outputDiv.innerHTML = '<p style="color: #8b949e;">🚀 جاري توليد الصورة عبر المحرك...</p>';
 
-            try {
-                // 1. ترجمة الوصف بدقة عالية جداً إلى الإنجليزية لضمان استجابة النموذج الصحيحة
-                const translateResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${arabPrompt}`)}`);
-                const translateData = await translateResponse.json();
-                const rawTranslation = JSON.parse(translateData.contents);
-                let englishPrompt = rawTranslation[0][0][0];
+            // ترميز النص وإرساله مباشرة للمحرك مع بصمة عشوائية لضمان تحديث الصورة فوراً
+            const seed = Math.floor(Math.random() * 999999);
+            const encodedPrompt = encodeURIComponent(prompt);
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?seed=${seed}&width=1024&height=1024&nologo=true`;
 
-                console.log("البرومبت المترجم:", englishPrompt);
+            const img = new Image();
+            img.src = imageUrl;
+            
+            img.onload = function() {
+                outputDiv.innerHTML = '';
+                outputDiv.appendChild(img);
+            };
 
-                // 2. استخدام محرك Pollinations المحدث مع بصمة عشوائية لضمان توليد صورة جديدة مطابقة تماماً وفورية
-                const seed = Math.floor(Math.random() * 1000000);
-                const encodedPrompt = encodeURIComponent(englishPrompt);
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&seed=${seed}&nologo=true`;
-
-                // تحميل الصورة والتأكد من ظهورها
-                const img = new Image();
-                img.src = imageUrl;
-                img.alt = "Generated Professional AI Image";
-                
-                img.onload = function() {
-                    outputDiv.innerHTML = '';
-                    outputDiv.appendChild(img);
-                };
-
-                img.onerror = function() {
-                    outputDiv.innerHTML = '<p style="color: #ff4444;">❌ حدث خطأ أثناء تحميل الصورة، حاول مرة أخرى.</p>';
-                };
-
-            } catch (error) {
-                console.error("خطأ:", error);
-                outputDiv.innerHTML = '<p style="color: #ff4444;">❌ فشل الاتصال بخدمة التوليد، تحقق من اتصالك.</p>';
-            }
+            img.onerror = function() {
+                outputDiv.innerHTML = '<p style="color: #ff4444;">❌ حدث خطأ في الاتصال، حاول مرة أخرى.</p>';
+            };
         }
 
         // دالة توليد أفكار الفيديوهات
         function generateIdea() {
-            const topic = document.getElementById('videoTopic').value;
+            const topic = document.getElementById('videoTopic'].value;
             const outputDiv = document.getElementById('ideaOutput');
             if (!topic) {
                 alert('الرجاء إدخال موضوع الفيديو!');
