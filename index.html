@@ -15,34 +15,37 @@
       --border: #30363d;
       --green: #238636;
       --red: #f85149;
+      --yellow: #d29922;
+      --shadow: rgba(0,0,0,.3);
     }
 
     * { box-sizing: border-box; }
 
     body {
-      font-family: system-ui, "Segoe UI", Tahoma, sans-serif;
-      background: var(--bg);
-      color: var(--text);
       margin: 0;
       padding: 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, "Segoe UI", Tahoma, sans-serif;
       line-height: 1.7;
     }
 
     header {
-      text-align: center;
-      padding: 24px 0;
-      border-bottom: 1px solid var(--border);
-      margin: 0 auto 24px;
       max-width: 900px;
+      margin: 0 auto 24px;
+      padding: 24px 0;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
     }
 
     header h1 {
-      color: var(--accent);
       margin: 0;
       font-size: clamp(1.6rem, 5vw, 2.2rem);
+      color: var(--accent);
     }
 
-    header p, .muted, .note {
+    header p {
+      margin: 10px 0 0;
       color: var(--muted);
     }
 
@@ -58,13 +61,17 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: clamp(16px, 4vw, 22px);
-      box-shadow: 0 4px 12px #0003;
+      box-shadow: 0 4px 12px var(--shadow);
     }
 
     h2 {
+      margin: 0 0 10px;
       color: var(--accent);
       font-size: 1.35rem;
-      margin: 0 0 10px;
+    }
+
+    p {
+      margin: 10px 0;
     }
 
     label {
@@ -74,20 +81,20 @@
     }
 
     input, textarea, select {
-      display: block;
       width: 100%;
+      display: block;
       padding: 12px;
       margin: 7px 0;
       background: #0d1117;
       border: 1px solid var(--border);
-      color: #fff;
       border-radius: 8px;
+      color: white;
       font: inherit;
       min-width: 0;
     }
 
     textarea {
-      min-height: 100px;
+      min-height: 110px;
       resize: vertical;
     }
 
@@ -103,6 +110,7 @@
       cursor: pointer;
       text-align: center;
       text-decoration: none;
+      transition: .2s ease;
     }
 
     button {
@@ -127,6 +135,7 @@
 
     .note {
       font-size: .86rem;
+      color: var(--muted);
       margin: 5px 0;
     }
 
@@ -146,6 +155,11 @@
 
     .status.ok {
       color: #7ee787;
+    }
+
+    .status.warn {
+      color: #f2c66d;
+      border-color: #7d5d1d;
     }
 
     .output-box {
@@ -193,15 +207,29 @@
       white-space: nowrap;
     }
 
-    @media(max-width:560px) {
+    .inline-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .inline-actions button {
+      width: auto;
+      margin-top: 0;
+      flex: 1 1 180px;
+    }
+
+    @media (max-width: 560px) {
       body { padding: 12px; }
       .row { grid-template-columns: 1fr; }
       .keyline { display: block; }
       .smallbtn { width: 100%; }
+      .inline-actions { display: block; }
+      .inline-actions button { width: 100%; }
     }
   </style>
 </head>
-
 <body>
 
 <header>
@@ -212,81 +240,44 @@
 <main class="container">
 
   <section class="card">
-    <h2>🔑 إعداد الاتصال بمحرك الذكاء الاصطناعي</h2>
-
-    <p>
-      تعتمد النسخة الجديدة على واجهة Pollinations Gen ونماذج حديثة.
-      استخدم مفتاحك الخاص من لوحة الحساب. لا تضع المفتاح داخل الكود أو المستودع.
-    </p>
+    <h2>🔑 إعداد الاتصال</h2>
+    <p>تأكد من أن الخادم يعمل محلياً عبر localhost، لأن بعض خدمات Pollinations لا تستجيب عندما تفتح الملف مباشرة.</p>
 
     <label for="apiKey">مفتاح API</label>
-
     <div class="keyline">
-      <input
-        id="apiKey"
-        type="password"
-        autocomplete="off"
-        placeholder="الصق مفتاحك هنا (sk_ أو pk_...)"
-      >
-
-      <button class="smallbtn" id="toggleKey" type="button">
-        إظهار
-      </button>
+      <input id="apiKey" type="password" autocomplete="off" placeholder="أدخل مفتاحك هنا (sk_ أو pk_...)">
+      <button class="smallbtn" id="toggleKey" type="button">إظهار</button>
     </div>
 
-    <p class="note">
-      يُحفظ المفتاح في ذاكرة الجلسة الحالية فقط، ويُمسح عند إغلاق التبويب.
-      راجع لوحة الخدمة لمعرفة الرصيد، التكلفة والحدود قبل التوليد.
-    </p>
+    <p class="note">يُحفظ المفتاح فقط داخل هذه الجلسة، ويُمسح عند إغلاق التبويب.</p>
 
-    <a
-      href="https://enter.pollinations.ai/"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="download"
-    >
-      الحصول على مفتاح API
-    </a>
-
-    <div id="keyStatus" class="status">
-      لم يتم إدخال مفتاح بعد.
+    <div class="inline-actions">
+      <button id="testApiBtn" type="button">اختبار الاتصال</button>
+      <a href="https://enter.pollinations.ai/" target="_blank" rel="noopener noreferrer" class="download">الحصول على مفتاح</a>
     </div>
+
+    <div id="keyStatus" class="status">لم يتم إدخال مفتاح بعد.</div>
   </section>
 
   <section class="card">
-    <h2>🎨 صانع الصور بالذكاء الاصطناعي</h2>
-
-    <p>
-      اكتب وصف الصورة بالعربية أو الإنجليزية. للحصول على نتيجة أدق، اذكر الموضوع والمكان والإضاءة والأسلوب والتكوين.
-    </p>
+    <h2>🎨 مولّد الصور</h2>
+    <p>اكتب وصف الصورة بالعربية أو الإنجليزية، ويُفضّل ذكر الموضوع والمكان والإضاءة والأسلوب والتكوين.</p>
 
     <label for="imagePrompt">وصف الصورة</label>
-
-    <textarea
-      id="imagePrompt"
-      placeholder="مثال: مسجد أبيض وسط كثبان الصحراء الجزائرية وقت الغروب، إضاءة سينمائية دافئة، تصوير واقعي عالي الدقة، تفاصيل دقيقة."
-    ></textarea>
+    <textarea id="imagePrompt" placeholder="مثال: مسجد أبيض وسط كثبان الصحراء الجزائرية وقت الغروب، إضاءة سينمائية دافئة، تصوير واقعي عالي الدقة."></textarea>
 
     <div class="row">
       <div>
         <label for="imageModel">نموذج الصور</label>
-
         <select id="imageModel">
-          <option value="black-forest-labs/flux.1-schnell">
-            FLUX.1 Schnell — سريع
-          </option>
-          <option value="google/gemini-3.1-flash-image">
-            Gemini Flash Image — فهم متقدم للوصف
-          </option>
-          <option value="black-forest-labs/flux.2-pro">
-            FLUX.2 Pro — جودة أعلى (قد يكون أغلى)
-          </option>
+          <option value="black-forest-labs/flux.1-schnell">FLUX.1 Schnell — سريع</option>
+          <option value="google/gemini-3.1-flash-image">Gemini Flash Image — جيد للوصف</option>
+          <option value="black-forest-labs/flux.2-pro">FLUX.2 Pro — جودة أعلى</option>
         </select>
       </div>
 
       <div>
         <label for="imageSize">أبعاد الصورة</label>
-
         <select id="imageSize">
           <option value="1024x1024">مربع 1:1</option>
           <option value="1024x1536">عمودي 2:3</option>
@@ -296,7 +287,6 @@
     </div>
 
     <label for="imageStyle">الأسلوب (اختياري)</label>
-
     <select id="imageStyle">
       <option value="">بدون تحديد</option>
       <option value="photorealistic, professional photography">واقعي فوتوغرافي</option>
@@ -306,36 +296,21 @@
       <option value="anime art, polished composition">أنمي</option>
     </select>
 
-    <button id="generateImageBtn" type="button">
-      توليد الصورة
-    </button>
-
-    <div id="imageStatus" class="status" aria-live="polite">
-      جاهز لاستقبال الوصف.
-    </div>
-
+    <button id="generateImageBtn" type="button">توليد الصورة</button>
+    <div id="imageStatus" class="status" aria-live="polite">جاهز لاستقبال الوصف.</div>
     <div class="output-box" id="imageOutput"></div>
   </section>
 
   <section class="card">
-    <h2>📝 مولّد أفكار الفيديوهات والسكريبت</h2>
-
-    <p>
-      أنشئ فكرة فيديو مع عنوان جذاب ومقدمة وسيناريو وخاتمة باللغة العربية.
-    </p>
+    <h2>📝 مولّد فكرة الفيديو</h2>
+    <p>أنشئ فكرة فيديو مع عنوان، مقدمة، سيناريو، وخاتمة باللغة العربية.</p>
 
     <label for="videoTopic">موضوع الفيديو</label>
-
-    <input
-      id="videoTopic"
-      type="text"
-      placeholder="مثال: أدوات ذكاء اصطناعي مجانية لصناع المحتوى"
-    >
+    <input id="videoTopic" type="text" placeholder="مثال: أدوات ذكاء اصطناعي مجانية لصناع المحتوى">
 
     <div class="row">
       <div>
         <label for="videoPlatform">المنصة</label>
-
         <select id="videoPlatform">
           <option>TikTok</option>
           <option>YouTube Shorts</option>
@@ -346,7 +321,6 @@
 
       <div>
         <label for="videoDuration">المدة</label>
-
         <select id="videoDuration">
           <option value="30 ثانية">30 ثانية</option>
           <option value="60 ثانية" selected>60 ثانية</option>
@@ -356,14 +330,8 @@
       </div>
     </div>
 
-    <button id="generateIdeaBtn" type="button">
-      إنشاء فكرة وسيناريو ذكي
-    </button>
-
-    <div id="ideaStatus" class="status" aria-live="polite">
-      أدخل موضوع الفيديو للبدء.
-    </div>
-
+    <button id="generateIdeaBtn" type="button">إنشاء فكرة وسيناريو ذكي</button>
+    <div id="ideaStatus" class="status" aria-live="polite">أدخل موضوع الفيديو للبدء.</div>
     <div id="ideaOutput" class="idea hidden"></div>
   </section>
 
@@ -373,43 +341,19 @@
 (() => {
   "use strict";
 
-  const $ = id => document.getElementById(id);
-
+  const $ = (id) => document.getElementById(id);
   const API_BASE = "https://gen.pollinations.ai";
   const KEY_STORE = "devWorkshopSessionKey";
+  const DEFAULT_IMAGE_MODEL = "black-forest-labs/flux.1-schnell";
+  const DEFAULT_TEXT_MODEL = "openai/gpt-5.4-nano";
 
-  let currentImageUrl = null;
-
-  try {
-    const savedKey = sessionStorage.getItem(KEY_STORE);
-    if (savedKey) {
-      $("apiKey").value = savedKey;
+  function showEnvironmentWarning() {
+    if (window.location.protocol === "file:") {
+      setStatus("keyStatus", "⚠️ انت تفتح الملف مباشرةً. استخدم خادم محلي مثل: python -m http.server 8000 ثم افتح http://localhost:8000", "warn");
+      return true;
     }
-  } catch (_) {}
-
-  $("apiKey").addEventListener("input", () => {
-    const key = $("apiKey").value.trim();
-
-    try {
-      if (key) {
-        sessionStorage.setItem(KEY_STORE, key);
-      } else {
-        sessionStorage.removeItem(KEY_STORE);
-      }
-    } catch (_) {}
-
-    $("keyStatus").textContent = key
-      ? "تم حفظ المفتاح لهذه الجلسة فقط."
-      : "لم يتم إدخال مفتاح بعد.";
-
-    $("keyStatus").className = "status";
-  });
-
-  $("toggleKey").addEventListener("click", () => {
-    const field = $("apiKey");
-    field.type = field.type === "password" ? "text" : "password";
-    $("toggleKey").textContent = field.type === "password" ? "إظهار" : "إخفاء";
-  });
+    return false;
+  }
 
   function normalizeKey(value) {
     return String(value || "").trim().replace(/^Bearer\s+/i, "");
@@ -437,18 +381,76 @@
   function buildImageUrl(prompt, model, size, key) {
     const { width, height } = parseSize(size);
     const url = new URL(API_BASE + "/image/" + encodeURIComponent(prompt));
-
-    url.searchParams.set("model", model);
-    url.searchParams.set("width", String(width));
-    url.searchParams.set("height", String(height));
+    url.searchParams.set("model", model || DEFAULT_IMAGE_MODEL);
+    url.searchParams.set("width", String(width || 1024));
+    url.searchParams.set("height", String(height || 1024));
     url.searchParams.set("nologo", "true");
-
-    if (key) {
-      url.searchParams.set("key", key);
-    }
-
+    if (key) url.searchParams.set("key", key);
     return url.toString();
   }
+
+  function saveKeyToSession() {
+    try {
+      const key = $("apiKey").value.trim();
+      if (key) {
+        sessionStorage.setItem(KEY_STORE, key);
+      } else {
+        sessionStorage.removeItem(KEY_STORE);
+      }
+    } catch (_) {}
+  }
+
+  try {
+    const savedKey = sessionStorage.getItem(KEY_STORE);
+    if (savedKey) $("apiKey").value = savedKey;
+  } catch (_) {}
+
+  showEnvironmentWarning();
+
+  $("apiKey").addEventListener("input", () => {
+    const key = $("apiKey").value.trim();
+    saveKeyToSession();
+    $("keyStatus").textContent = key ? "تم حفظ المفتاح لهذه الجلسة فقط." : "لم يتم إدخال مفتاح بعد.";
+    $("keyStatus").className = "status";
+  });
+
+  $("toggleKey").addEventListener("click", () => {
+    const field = $("apiKey");
+    field.type = field.type === "password" ? "text" : "password";
+    $("toggleKey").textContent = field.type === "password" ? "إظهار" : "إخفاء";
+  });
+
+  async function testApiConnection() {
+    const key = normalizeKey($("apiKey").value);
+
+    if (!key) {
+      setStatus("keyStatus", "أدخل مفتاح API أولاً ثم جرّب الاتصال.", "error");
+      return;
+    }
+
+    setStatus("keyStatus", "⏳ جاري اختبار الاتصال...", "");
+
+    try {
+      const response = await fetch(API_BASE + "/v1/models", {
+        headers: {
+          Authorization: "Bearer " + key
+        }
+      });
+
+      if (!response.ok) {
+        const text = await response.text().catch(() => "");
+        throw new Error(`فشل اختبار الاتصال (${response.status}). ${text.slice(0, 220)}`);
+      }
+
+      const data = await response.json();
+      const count = Array.isArray(data?.data) ? data.data.length : 0;
+      setStatus("keyStatus", `✅ الاتصال يعمل بنجاح. عدد النماذج المتاحة: ${count}`, "ok");
+    } catch (error) {
+      setStatus("keyStatus", "❌ " + (error.message || "فشل الاتصال"), "error");
+    }
+  }
+
+  $("testApiBtn").addEventListener("click", testApiConnection);
 
   $("generateImageBtn").addEventListener("click", async () => {
     const prompt = $("imagePrompt").value.trim();
@@ -456,81 +458,74 @@
     const button = $("generateImageBtn");
 
     if (!prompt) {
-      return setStatus("imageStatus", "اكتب وصف الصورة أولاً.", "error");
+      setStatus("imageStatus", "اكتب وصف الصورة أولاً.", "error");
+      return;
     }
 
-    let key;
     try {
-      key = getApiKey();
+      const key = getApiKey();
+      const model = $("imageModel").value || DEFAULT_IMAGE_MODEL;
+      const size = $("imageSize").value;
+      const style = $("imageStyle").value;
+      const finalPrompt = style ? `${prompt}, ${style}` : prompt;
+
+      button.disabled = true;
+      button.textContent = "جارٍ التوليد...";
+      output.replaceChildren();
+      setStatus("imageStatus", "⏳ يتم إرسال الطلب إلى محرك الصور...");
+
+      const image = new Image();
+      image.alt = "Image result";
+      image.loading = "eager";
+      image.referrerPolicy = "no-referrer";
+
+      const imageUrl = buildImageUrl(finalPrompt, model, size, key);
+      let finished = false;
+
+      const timeout = setTimeout(() => {
+        if (finished) return;
+        finished = true;
+        image.src = "";
+        setStatus("imageStatus", "انتهت مهلة الانتظار. جرّب نموذجاً أسرع أو أعد المحاولة.", "error");
+        button.disabled = false;
+        button.textContent = "توليد الصورة";
+      }, 180000);
+
+      image.onload = () => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timeout);
+
+        output.replaceChildren(image);
+
+        const download = document.createElement("a");
+        download.className = "download";
+        download.href = imageUrl;
+        download.target = "_blank";
+        download.rel = "noopener noreferrer";
+        download.textContent = "فتح الصورة بالحجم الكامل";
+        output.appendChild(download);
+
+        setStatus("imageStatus", "✅ اكتمل توليد الصورة. يمكنك فتحها وحفظها من المتصفح.", "ok");
+        button.disabled = false;
+        button.textContent = "توليد صورة أخرى";
+      };
+
+      image.onerror = () => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timeout);
+        setStatus("imageStatus", "❌ تعذر توليد الصورة. تحقق من المفتاح، الرصيد، والنموذج المختار، ثم جرّب مجدداً.", "error");
+        button.disabled = false;
+        button.textContent = "إعادة المحاولة";
+      };
+
+      image.src = imageUrl;
     } catch (error) {
-      return setStatus("imageStatus", error.message, "error");
-    }
-
-    const style = $("imageStyle").value;
-    const finalPrompt = style ? `${prompt}, ${style}` : prompt;
-    const model = $("imageModel").value;
-    const size = $("imageSize").value;
-
-    button.disabled = true;
-    button.textContent = "جارٍ التوليد...";
-    output.replaceChildren();
-    setStatus("imageStatus", "⏳ يتم إرسال الطلب إلى محرك الصور. قد يستغرق ذلك بعض الوقت...");
-
-    const image = new Image();
-    image.alt = "الصورة التي تم توليعها";
-    image.loading = "eager";
-    image.referrerPolicy = "no-referrer";
-
-    const imageUrl = buildImageUrl(finalPrompt, model, size, key);
-    currentImageUrl = imageUrl;
-
-    let finished = false;
-    const timeout = setTimeout(() => {
-      if (finished) return;
-      finished = true;
-      image.src = "";
-      setStatus("imageStatus", "انتهت مهلة الانتظار. جرّب نموذجاً أسرع أو أعد المحاولة.", "error");
+      setStatus("imageStatus", "❌ " + (error.message || "حدث خطأ غير متوقع."), "error");
       button.disabled = false;
       button.textContent = "توليد الصورة";
-    }, 180000);
-
-    image.onload = () => {
-      if (finished) return;
-      finished = true;
-      clearTimeout(timeout);
-
-      output.replaceChildren(image);
-
-      const download = document.createElement("a");
-      download.className = "download";
-      download.href = imageUrl;
-      download.target = "_blank";
-      download.rel = "noopener noreferrer";
-      download.textContent = "فتح الصورة بالحجم الكامل";
-      output.appendChild(download);
-
-      setStatus("imageStatus", "✅ اكتمل توليد الصورة. يمكنك فتحها وحفظها من المتصفح.", "ok");
-      button.disabled = false;
-      button.textContent = "توليد صورة أخرى";
-    };
-
-    image.onerror = () => {
-      if (finished) return;
-      finished = true;
-      clearTimeout(timeout);
-
-      console.error("Image generation failed:", imageUrl);
-      setStatus(
-        "imageStatus",
-        "❌ تعذر توليد الصورة. تحقق من المفتاح والرصيد واسم النموذج، ثم جرّب مجدداً. قد يكون السبب رفض الطلب أو ضغط الخادم.",
-        "error"
-      );
-
-      button.disabled = false;
-      button.textContent = "إعادة المحاولة";
-    };
-
-    image.src = imageUrl;
+    }
   });
 
   $("generateIdeaBtn").addEventListener("click", async () => {
@@ -539,81 +534,71 @@
     const output = $("ideaOutput");
 
     if (!topic) {
-      return setStatus("ideaStatus", "أدخل موضوع الفيديو أولاً.", "error");
+      setStatus("ideaStatus", "أدخل موضوع الفيديو أولاً.", "error");
+      return;
     }
 
-    let key;
     try {
-      key = getApiKey();
-    } catch (error) {
-      return setStatus("ideaStatus", error.message, "error");
-    }
+      const key = getApiKey();
+      const platform = $("videoPlatform").value;
+      const duration = $("videoDuration").value;
 
-    button.disabled = true;
-    button.textContent = "جارٍ إنشاء السيناريو...";
-    output.classList.add("hidden");
-    setStatus("ideaStatus", "⏳ يكتب النموذج فكرة الفيديو والسكريبت...");
+      button.disabled = true;
+      button.textContent = "جارٍ إنشاء السيناريو...";
+      output.classList.add("hidden");
+      setStatus("ideaStatus", "⏳ يكتب النموذج فكرة الفيديو والسكريبت...");
 
-    const platform = $("videoPlatform").value;
-    const duration = $("videoDuration").value;
+      const requestBody = {
+        model: DEFAULT_TEXT_MODEL,
+        messages: [
+          {
+            role: "system",
+            content: "أنت كاتب محتوى عربي محترف. اكتب بالعربية الواضحة وبأسلوب عملي ومناسب لصناع المحتوى. لا تخترع حقائق أو أرقام غير مؤكدة. اكتب بتنسيق واضح وقابل للتنفيذ، مع عنوان جذاب، مقدمة قصيرة، نقاط رئيسية، سيناريو متدرج، وخاتمة قوية."
+          },
+          {
+            role: "user",
+            content: `أنشئ فكرة وسيناريو لفيديو عن: ${topic}\nالمنصة: ${platform}\nالمدة: ${duration}\nاجعل النص قابلاً للتنفيذ، عملياً، وبأسلوب عربي احترافي ومناسب للمحتوى الرقمي.`
+          }
+        ],
+        temperature: 0.8,
+        max_tokens: 1200
+      };
 
-    const requestBody = {
-      model: "openai/gpt-5.4-nano",
-      messages: [
-        {
-          role: "system",
-          content:
-            "أنت كاتب محتوى عربي محترف. اكتب بالعربية الواضحة وبأسلوب عملي ومناسب لصناع المحتوى. لا تخترع حقائق أو أرقام غير مؤكدة. اكتب بتنسيق واضح وقابل للتنفيذ، مع عنوان جذاب، مقدمة قصيرة، نقاط رئيسية، سيناريو متدرج، وخاتمة قوية."
-        },
-        {
-          role: "user",
-          content: `أنشئ فكرة وسيناريو لفيديو عن: ${topic}
-المنصة: ${platform}
-المدة: ${duration}
-اجعل النص قابلاً للتنفيذ، عملياً، وبأسلوب عربي احترافي ومناسب للمحتوى الرقمي.`
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 90000);
+
+      try {
+        const response = await fetch(API_BASE + "/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + key
+          },
+          body: JSON.stringify(requestBody),
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          const detail = await response.text().catch(() => "");
+          throw new Error(`فشل الطلب (${response.status}). ${detail.slice(0, 240)}`);
         }
-      ],
-      temperature: 0.8,
-      max_tokens: 1200
-    };
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 90000);
+        const data = await response.json();
+        const text = data?.choices?.[0]?.message?.content;
+        if (!text) {
+          throw new Error("وصل رد غير متوقع من النموذج.");
+        }
 
-    try {
-      const response = await fetch(API_BASE + "/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + key
-        },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal
-      });
-
-      if (!response.ok) {
-        const detail = await response.text().catch(() => "");
-        throw new Error(`فشل الطلب (${response.status}). ${detail.slice(0, 240)}`);
+        output.textContent = text;
+        output.classList.remove("hidden");
+        setStatus("ideaStatus", "✅ تم إنشاء السيناريو بنجاح.", "ok");
+      } finally {
+        clearTimeout(timeout);
       }
-
-      const data = await response.json();
-      const text = data?.choices?.[0]?.message?.content;
-
-      if (!text) {
-        throw new Error("وصل رد غير متوقع من النموذج.");
-      }
-
-      output.textContent = text;
-      output.classList.remove("hidden");
-      setStatus("ideaStatus", "✅ تم إنشاء السيناريو بنجاح.", "ok");
     } catch (error) {
-      const message = error.name === "AbortError"
-        ? "انتهت مهلة الطلب. حاول مجدداً."
-        : error.message || "حدث خطأ غير متوقع.";
-
+      const message = error.name === "AbortError" ? "انتهت مهلة الطلب. حاول مجدداً." : (error.message || "حدث خطأ غير متوقع.");
       setStatus("ideaStatus", "❌ " + message, "error");
     } finally {
-      clearTimeout(timeout);
       button.disabled = false;
       button.textContent = "إنشاء فكرة وسيناريو ذكي";
     }
