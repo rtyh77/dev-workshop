@@ -360,7 +360,7 @@
   }
 
   function getApiKey() {
-    const key = normalizeKey($("apiKey").value);
+    const key = normalizeKey($("#apiKey").value);
     if (!key) {
       throw new Error("أدخل مفتاح API أولاً من قسم إعداد الاتصال.");
     }
@@ -391,7 +391,7 @@
 
   function saveKeyToSession() {
     try {
-      const key = $("apiKey").value.trim();
+      const key = $("#apiKey").value.trim();
       if (key) {
         sessionStorage.setItem(KEY_STORE, key);
       } else {
@@ -402,26 +402,26 @@
 
   try {
     const savedKey = sessionStorage.getItem(KEY_STORE);
-    if (savedKey) $("apiKey").value = savedKey;
+    if (savedKey) $("#apiKey").value = savedKey;
   } catch (_) {}
 
   showEnvironmentWarning();
 
-  $("apiKey").addEventListener("input", () => {
-    const key = $("apiKey").value.trim();
+  $("#apiKey").addEventListener("input", () => {
+    const key = $("#apiKey").value.trim();
     saveKeyToSession();
-    $("keyStatus").textContent = key ? "تم حفظ المفتاح لهذه الجلسة فقط." : "لم يتم إدخال مفتاح بعد.";
-    $("keyStatus").className = "status";
+    $("#keyStatus").textContent = key ? "تم حفظ المفتاح لهذه الجلسة فقط." : "لم يتم إدخال مفتاح بعد.";
+    $("#keyStatus").className = "status";
   });
 
-  $("toggleKey").addEventListener("click", () => {
-    const field = $("apiKey");
+  $("#toggleKey").addEventListener("click", () => {
+    const field = $("#apiKey");
     field.type = field.type === "password" ? "text" : "password";
-    $("toggleKey").textContent = field.type === "password" ? "إظهار" : "إخفاء";
+    $("#toggleKey").textContent = field.type === "password" ? "إظهار" : "إخفاء";
   });
 
   async function testApiConnection() {
-    const key = normalizeKey($("apiKey").value);
+    const key = normalizeKey($("#apiKey").value);
 
     if (!key) {
       setStatus("keyStatus", "أدخل مفتاح API أولاً ثم جرّب الاتصال.", "error");
@@ -450,12 +450,12 @@
     }
   }
 
-  $("testApiBtn").addEventListener("click", testApiConnection);
+  $("#testApiBtn").addEventListener("click", testApiConnection);
 
-  $("generateImageBtn").addEventListener("click", async () => {
-    const prompt = $("imagePrompt").value.trim();
-    const output = $("imageOutput");
-    const button = $("generateImageBtn");
+  $("#generateImageBtn").addEventListener("click", async () => {
+    const prompt = $("#imagePrompt").value.trim();
+    const output = $("#imageOutput");
+    const button = $("#generateImageBtn");
 
     if (!prompt) {
       setStatus("imageStatus", "اكتب وصف الصورة أولاً.", "error");
@@ -464,9 +464,9 @@
 
     try {
       const key = getApiKey();
-      const model = $("imageModel").value || DEFAULT_IMAGE_MODEL;
-      const size = $("imageSize").value;
-      const style = $("imageStyle").value;
+      const model = $("#imageModel").value || DEFAULT_IMAGE_MODEL;
+      const size = $("#imageSize").value;
+      const style = $("#imageStyle").value;
       const finalPrompt = style ? `${prompt}, ${style}` : prompt;
 
       button.disabled = true;
@@ -528,10 +528,10 @@
     }
   });
 
-  $("generateIdeaBtn").addEventListener("click", async () => {
-    const topic = $("videoTopic").value.trim();
-    const button = $("generateIdeaBtn");
-    const output = $("ideaOutput");
+  $("#generateIdeaBtn").addEventListener("click", async () => {
+    const topic = $("#videoTopic").value.trim();
+    const button = $("#generateIdeaBtn");
+    const output = $("#ideaOutput");
 
     if (!topic) {
       setStatus("ideaStatus", "أدخل موضوع الفيديو أولاً.", "error");
@@ -540,8 +540,8 @@
 
     try {
       const key = getApiKey();
-      const platform = $("videoPlatform").value;
-      const duration = $("videoDuration").value;
+      const platform = $("#videoPlatform").value;
+      const duration = $("#videoDuration").value;
 
       button.disabled = true;
       button.textContent = "جارٍ إنشاء السيناريو...";
@@ -607,4 +607,4 @@
 </script>
 
 </body>
-</html>
+      </html>
